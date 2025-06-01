@@ -1,0 +1,53 @@
+---
+import { languages } from "../i18n/ui";
+import { getLangFromUrl, getRouteFromUrl, useTranslatedPath, useTranslations } from "../i18n/utils";
+
+const route = getRouteFromUrl(Astro.url);
+const currentLang = getLangFromUrl(Astro.url);
+const t = useTranslations(currentLang);
+---
+
+<div class="dropdown dropdown-end">
+  <div tabindex="0" role="button" class="btn m-1">
+    {t("language")}
+    <svg
+      width="12px"
+      height="12px"
+      class="inline-block h-2 w-2 fill-current opacity-60"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 2048 2048"
+    >
+      <path d="M1799 349l242 241-1017 1017L7 590l242-241 775 775 775-775z"></path>
+    </svg>
+  </div>
+  <ul tabindex="0" class="dropdown-content bg-base-300 rounded-box z-1 p-2 shadow-2xl">
+    {
+      Object.entries(languages).map(([lang, label]) => {
+        // @ts-expect-error false error
+        const translatePath = useTranslatedPath(lang);
+        return (
+          <li>
+            <a
+              class:list={[
+                "w-full",
+                "btn",
+                "btn-sm",
+                "btn-block",
+                "btn-ghost",
+                "justify-start",
+                {
+                  "btn-active": lang === currentLang,
+                },
+              ]}
+              href={translatePath(`/${route ? route : ""}`)}
+            >
+              {label}
+            </a>
+          </li>
+        );
+      })
+    }
+  </ul>
+</div>
+
+<!-- <a href={translatePath(`/${Astro.url.pathname.split("/")[2]}`, lang)}>{label}</a> -->

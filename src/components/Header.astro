@@ -1,0 +1,96 @@
+---
+// const links = [
+//   { name: "Item 1", href: "#" },
+//   {
+//     name: "Parent",
+//     submenu: [
+//       { name: "Submenu 1", href: "#" },
+//       { name: "Submenu 2", href: "#" },
+//     ],
+//   },
+//   { name: "Item 3", href: "#" },
+// ];
+
+import { getLangFromUrl, useTranslations, useTranslatedPath } from "../i18n/utils";
+import LanguagePicker from "./LanguagePicker.astro";
+
+import favicon from "../../public/favicon.svg";
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+
+type Link = {
+  name: string;
+  href?: string;
+  submenu?: Link[];
+};
+
+const links: Link[] = [
+  { name: t("nav.home"), href: translatePath(`/`) },
+  { name: t("nav.resume"), href: translatePath(`/resume`) },
+  { name: t("nav.projects"), href: translatePath(`/projects`) },
+];
+---
+
+<header>
+  <nav class="navbar bg-base-100 shadow-sm">
+    <div class="navbar-start">
+      <a class="btn bg-base-100 border-0 shadow-none text-2xl" href={translatePath(`/`)}>
+        <img class="w-6 rounded" src={favicon.src} />&nbsp;Orka Arnest Cruze
+      </a>
+    </div>
+    <div class="navbar-end">
+      <div class="hidden lg:flex">
+        <ul class="menu menu-horizontal px-1">
+          {
+            links.map((link) => (
+              <li>
+                {link.submenu ? (
+                  <details>
+                    <summary>{link.name}</summary>
+                    <ul class="p-2">
+                      {link.submenu.map((sub) => (
+                        <li>
+                          <a href={sub.href}>{sub.name}</a>
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                ) : (
+                  <a href={link.href}>{link.name}</a>
+                )}
+              </li>
+            ))
+          }
+        </ul>
+        <LanguagePicker />
+      </div>
+      <div class="dropdown dropdown-bottom dropdown-end">
+        <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16"></path>
+          </svg>
+        </div>
+        <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 p-2 shadow">
+          {
+            links.map((link) => (
+              <li>
+                <a href={link.href}>{link.name}</a>
+                {link.submenu && (
+                  <ul class="p-2">
+                    {link.submenu.map((sub) => (
+                      <li>
+                        <a href={sub.href}>{sub.name}</a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>
