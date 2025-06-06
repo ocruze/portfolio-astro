@@ -15,11 +15,18 @@ export function useTranslations(lang: Language) {
 
 export function useTranslatedPath(lang: Language) {
   return function translatePath(path: string, l: Language = lang) {
-    const pathName = path.replaceAll("/", "");
-    const hasTranslation = defaultLang !== l && routes[l] !== undefined && routes[l][pathName] !== undefined;
-    const translatedPath = hasTranslation ? "/" + routes[l][pathName] : path;
+    // Get the site's base path from import.meta.env.BASE_URL or default to '/'
+    const basePath = import.meta.env.BASE_URL ? import.meta.env.BASE_URL.replace(/\/$/, "") : "";
 
-    return !showDefaultLang && l === defaultLang ? translatedPath : `/${l}${translatedPath}`;
+    // Handle the path normalization
+    const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+    const pathName = normalizedPath.replaceAll("/", "");
+
+    const hasTranslation = defaultLang !== l && routes[l] !== undefined && routes[l][pathName] !== undefined;
+    const translatedPath = hasTranslation ? `/${routes[l][pathName]}` : normalizedPath;
+
+    // Apply the base path to the final URL
+    return basePath + (!showDefaultLang && l === defaultLang ? translatedPath : `/${l}${translatedPath}`);
   };
 }
 
